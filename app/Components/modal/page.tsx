@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { Button, Label, Modal, TextInput } from 'flowbite-react';
+import { Button, Label, Modal, TextInput, Textarea } from 'flowbite-react';
 
 interface ModalProps {
   showModalCreate: boolean;
@@ -12,12 +12,14 @@ export default function CreateModal(prop: ModalProps): JSX.Element {
     productName: string;
     category: string;
     brand: string;
+    stock: string;
     description: string;
     price: string;
   }>({
     productName: '',
     category: '',
     brand: '',
+    stock: '',
     description: '',
     price: '',
   });
@@ -29,6 +31,7 @@ export default function CreateModal(prop: ModalProps): JSX.Element {
       form.productName,
       form.category,
       form.brand,
+      form.stock,
       form.description,
       form.price
     );
@@ -39,6 +42,7 @@ export default function CreateModal(prop: ModalProps): JSX.Element {
       productName: '',
       category: '',
       brand: '',
+      stock: '',
       description: '',
       price: '',
     });
@@ -48,7 +52,6 @@ export default function CreateModal(prop: ModalProps): JSX.Element {
     <>
       <Modal
         show={showModalCreate}
-        // size='xl'
         onClose={() => handleCloseModal()}
       >
         <Modal.Header />
@@ -104,9 +107,8 @@ export default function CreateModal(prop: ModalProps): JSX.Element {
                 <Label htmlFor='description' value='Description' />
               </div>
               <br />
-              <TextInput
+              <Textarea
                 id='description'
-                type='text'
                 placeholder='Apple iphone'
                 required
                 value={form.description}
@@ -131,7 +133,7 @@ export default function CreateModal(prop: ModalProps): JSX.Element {
             <br />
             <div>
               <Button className='w-full' onClick={() => handleSubmit()}>
-                Create User
+                Create Product
               </Button>
             </div>
           </div>
