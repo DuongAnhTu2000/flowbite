@@ -2,13 +2,13 @@
 import { Button, Dropdown, Pagination, Table } from 'flowbite-react';
 import React, { useEffect, useState } from 'react';
 import CreateModal from '../modal/page';
-// import Search from '../Search/page';
 
 const URL = 'https://dummyjson.com/products/';
 export default function Dashboard() {
   const [showModalCreate, setShowModalCreate] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchValue, setSearchValue] = useState('');
+  const [sortProduct, setsortProduct] = useState('');
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -16,13 +16,37 @@ export default function Dashboard() {
       const res = await fetch(URL);
       const data = await res.json();
       setData(data.products);
-      console.log('data1:',data.products);
     };
     getProducts();
-    
   }, []);
 
-
+  useEffect(() => {
+    let searchProduct = [...data];
+    
+    if (searchValue !== '') {
+      searchProduct = searchProduct.filter((item: any) =>
+        item.title.toLowerCase().includes(searchValue.toLowerCase())
+      );
+    }
+    if (sortProduct !== '') {
+      switch (sortProduct) {
+        case 'ascending':
+          searchProduct = searchProduct.sort((a, b) => {
+            return a.price - b.price;
+          });
+          break;
+        case 'descending':
+          searchProduct = searchProduct.sort((a, b) => {
+            return b.price - a.price;
+          });
+          break;
+        default:
+          searchProduct = searchProduct;
+          break;
+      }
+    }
+    setData(searchProduct);
+  }, [searchValue, sortProduct]);
   const handleFiler = (): void => {
     console.log('filter');
   };
@@ -60,7 +84,8 @@ export default function Dashboard() {
                       type='text'
                       id='simple-search'
                       className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2  dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-primary-500 dark:focus:border-primary-500'
-                      placeholder='Search'
+                      placeholder='Search...'
+                      onChange={e => setSearchValue(e.target.value)}
                     />
                   </div>
                 </div>
@@ -76,8 +101,8 @@ export default function Dashboard() {
                   </div>
                   <div>
                     <Dropdown label='Filter'>
-                      <Dropdown.Item onClick={() => handleFiler()}>Sort A to Z</Dropdown.Item>
-                      <Dropdown.Item onClick={() => handleFiler()}>Sort Z to A</Dropdown.Item>
+                      <Dropdown.Item value="ascending">Sort A to Z</Dropdown.Item>
+                      <Dropdown.Item value="descending">Sort Z to A</Dropdown.Item>
                     </Dropdown>
                   </div>
                 </div>
