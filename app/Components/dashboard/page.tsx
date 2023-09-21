@@ -1,11 +1,12 @@
 'use client';
-import { Button, Dropdown, Label, Pagination, Select, Table } from 'flowbite-react';
+import { Button, Dropdown, Pagination, Select, Table } from 'flowbite-react';
 import React, { useEffect, useState } from 'react';
 import CreateModal from '../modal/page';
 
 export default function Dashboard() {
   const [showModalCreate, setShowModalCreate] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [dataPage, setDataPage] = useState<any[]>([]);
   const [searchValue, setSearchValue] = useState<string>('');
   const [sortProduct, setSortProduct] = useState<string>('default');
   const [data, setData] = useState<any[]>([]);
@@ -13,8 +14,12 @@ export default function Dashboard() {
   useEffect(() => {
     const getProducts = async () => {
       const res = await fetch(`${process.env.API_KEY}`);
-      const data = await res.json();
-      setData(data.products);
+      const dataProducts = await res.json();
+      setData(dataProducts.products);
+      let newProduct = [...dataProducts.products];
+      let pageSize = 10;
+      newProduct = newProduct.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+      setDataPage(newProduct);
     };
     getProducts();
   }, []);
@@ -46,8 +51,12 @@ export default function Dashboard() {
           break;
       }
     }
-    setData(newProduct);
-  }, [searchValue, sortProduct]);
+
+    let pageSize = 10;
+    newProduct = newProduct.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+    setDataPage(newProduct);
+    return () => {};
+  }, [searchValue, sortProduct, currentPage]);
 
   return (
     <div>
@@ -123,7 +132,7 @@ export default function Dashboard() {
                     <span className='sr-only'>Edit</span>
                   </Table.HeadCell>
                 </Table.Head>
-                {data.map((product: any) => (
+                {dataPage.map((product: any) => (
                   <Table.Body className='divide-y' key={product.id}>
                     <Table.Row className='bg-white'>
                       <Table.Cell className='whitespace-nowrap font-medium text-gray-900'>
@@ -157,11 +166,11 @@ export default function Dashboard() {
                 <span className='font-semibold text-gray-900 dark:text-white'>30</span>
               </span>
               <Pagination
-                currentPage={1}
+                currentPage={currentPage}
                 onPageChange={page => {
                   setCurrentPage(page);
                 }}
-                totalPages={10}
+                totalPages={3}
               />
             </nav>
           </div>
