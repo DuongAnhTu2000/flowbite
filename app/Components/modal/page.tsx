@@ -5,6 +5,7 @@ import { Button, Label, Modal, TextInput, Textarea } from 'flowbite-react';
 interface ModalProps {
   showModalCreate: boolean;
   setShowModalCreate: (show: boolean) => void;
+  data: any[];
 }
 
 export default function CreateModal(prop: ModalProps): JSX.Element {
@@ -23,18 +24,21 @@ export default function CreateModal(prop: ModalProps): JSX.Element {
     description: '',
     price: '',
   });
-  const { showModalCreate, setShowModalCreate } = prop;
+  const { showModalCreate, setShowModalCreate, data } = prop;
 
   const handleSubmit = (): void => {
-    console.log(
-      'check data form',
-      form.productName,
-      form.category,
-      form.brand,
-      form.stock,
-      form.description,
-      form.price
-    );
+    setTimeout(() => {
+      setShowModalCreate(false);
+      console.log(
+        'check data form',
+        form.productName,
+        form.category,
+        form.brand,
+        form.stock,
+        form.description,
+        form.price
+      );
+    }, 1000);
   };
 
   const handleCloseModal = (): void => {
@@ -48,12 +52,13 @@ export default function CreateModal(prop: ModalProps): JSX.Element {
     });
     setShowModalCreate(false);
   };
+
+  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  //   setForm({ ...form, [e.target.name]: e.target.value });
+  // };
   return (
     <>
-      <Modal
-        show={showModalCreate}
-        onClose={() => handleCloseModal()}
-      >
+      <Modal show={showModalCreate} onClose={() => handleCloseModal()}>
         <Modal.Header />
         <Modal.Body>
           <div className='w-full'>
@@ -67,8 +72,11 @@ export default function CreateModal(prop: ModalProps): JSX.Element {
                 id='product-name'
                 placeholder='Product Name'
                 required
+                name='title'
                 value={form.productName}
-                onChange={e => setForm({ ...form, productName: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setForm({ ...form, productName: e.target.value })
+                }
               />
             </div>
             <br />
@@ -82,8 +90,11 @@ export default function CreateModal(prop: ModalProps): JSX.Element {
                 type='text'
                 placeholder='Cellphone'
                 required
+                name='category'
                 value={form.category}
-                onChange={e => setForm({ ...form, category: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setForm({ ...form, category: e.target.value })
+                }
               />
             </div>
             <br />
@@ -97,8 +108,11 @@ export default function CreateModal(prop: ModalProps): JSX.Element {
                 type='text'
                 placeholder='Apple'
                 required
+                name='brand'
                 value={form.brand}
-                onChange={e => setForm({ ...form, brand: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setForm({ ...form, brand: e.target.value })
+                }
               />
             </div>
             <div>
@@ -111,8 +125,11 @@ export default function CreateModal(prop: ModalProps): JSX.Element {
                 id='description'
                 placeholder='Apple iphone'
                 required
+                name='description'
                 value={form.description}
-                onChange={e => setForm({ ...form, description: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  setForm({ ...form, description: e.target.value })
+                }
               />
             </div>
             <div>
@@ -126,8 +143,11 @@ export default function CreateModal(prop: ModalProps): JSX.Element {
                 type='text'
                 placeholder='999$'
                 required
+                name='price'
                 value={form.price}
-                onChange={e => setForm({ ...form, price: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setForm({ ...form, price: e.target.value })
+                }
               />
             </div>
             <br />

@@ -1,19 +1,18 @@
 'use client';
-import { Button, Dropdown, Pagination, Table } from 'flowbite-react';
+import { Button, Dropdown, Label, Pagination, Select, Table } from 'flowbite-react';
 import React, { useEffect, useState } from 'react';
 import CreateModal from '../modal/page';
 
-const URL = 'https://dummyjson.com/products/';
 export default function Dashboard() {
   const [showModalCreate, setShowModalCreate] = useState<boolean>(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchValue, setSearchValue] = useState('');
-  const [sortProduct, setsortProduct] = useState('');
-  const [data, setData] = useState([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [searchValue, setSearchValue] = useState<string>('');
+  const [sortProduct, setSortProduct] = useState<string>('default');
+  const [data, setData] = useState<any[]>([]);
 
   useEffect(() => {
     const getProducts = async () => {
-      const res = await fetch(URL);
+      const res = await fetch(`${process.env.API_KEY}`);
       const data = await res.json();
       setData(data.products);
     };
@@ -21,36 +20,34 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    let searchProduct = [...data];
-    
+    let newProduct = [...data];
     if (searchValue !== '') {
-      searchProduct = searchProduct.filter((item: any) =>
+      newProduct = newProduct.filter((item: any) =>
         item.title.toLowerCase().includes(searchValue.toLowerCase())
       );
     }
+
     if (sortProduct !== '') {
       switch (sortProduct) {
+        case 'default':
+          newProduct = newProduct.sort((a, b) => {
+            return a.id > b.id ? 1 : -1;
+          });
+          break;
         case 'ascending':
-          searchProduct = searchProduct.sort((a, b) => {
+          newProduct = newProduct.sort((a, b) => {
             return a.price - b.price;
           });
           break;
         case 'descending':
-          searchProduct = searchProduct.sort((a, b) => {
+          newProduct = newProduct.sort((a, b) => {
             return b.price - a.price;
           });
           break;
-        default:
-          searchProduct = searchProduct;
-          break;
       }
     }
-    setData(searchProduct);
+    setData(newProduct);
   }, [searchValue, sortProduct]);
-  const handleFiler = (): void => {
-    console.log('filter');
-  };
-  // const onPageChange = (page: number) => setCurrentPage(page);
 
   return (
     <div>
@@ -83,7 +80,7 @@ export default function Dashboard() {
                     <input
                       type='text'
                       id='simple-search'
-                      className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2  dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-primary-500 dark:focus:border-primary-500'
+                      className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 block w-full pl-10 p-2  dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-primary-500 dark:focus:border-primary-500'
                       placeholder='Search...'
                       onChange={e => setSearchValue(e.target.value)}
                     />
@@ -97,13 +94,20 @@ export default function Dashboard() {
                     <CreateModal
                       showModalCreate={showModalCreate}
                       setShowModalCreate={setShowModalCreate}
+                      data={data}
                     />
                   </div>
-                  <div>
-                    <Dropdown label='Filter'>
-                      <Dropdown.Item value="ascending">Sort A to Z</Dropdown.Item>
-                      <Dropdown.Item value="descending">Sort Z to A</Dropdown.Item>
-                    </Dropdown>
+                  <div className='max-w-md flex items-center justify-between gap-4' id='select'>
+                    <Select
+                      value={sortProduct}
+                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                        setSortProduct(e.target.value)
+                      }
+                    >
+                      <option value='default'>Default</option>
+                      <option value='ascending'>Sort by price: Low to High</option>
+                      <option value='descending'>Sort by price: High to Low</option>
+                    </Select>
                   </div>
                 </div>
               </div>
