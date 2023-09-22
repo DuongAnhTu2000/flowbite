@@ -1,10 +1,16 @@
 'use client';
-import { Button, Dropdown, Pagination, Select, Table } from 'flowbite-react';
+import { Button, Pagination, Select, Table } from 'flowbite-react';
 import React, { useEffect, useState } from 'react';
-import CreateModal from '../modal/page';
+import CreateModal from '../modal/create.modal';
+import UpdateModal from '../modal/update.modal';
+import DeleteModal from '../modal/delete.modal';
+import ViewModal from '../modal/view.modal';
 
 export default function Dashboard() {
   const [showModalCreate, setShowModalCreate] = useState<boolean>(false);
+  const [showModalUpdate, setShowModalUpdate] = useState<boolean>(false);
+  const [showModalView, setShowModalView] = useState<boolean>(false);
+  const [showModalDelete, setShowModalDelete] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [dataPage, setDataPage] = useState<any[]>([]);
   const [searchValue, setSearchValue] = useState<string>('');
@@ -13,10 +19,10 @@ export default function Dashboard() {
 
   useEffect(() => {
     const getProducts = async () => {
-      const res = await fetch(`${process.env.API_KEY}`);
+      const res = await fetch(`${process.env.API_URL}/product`);
       const dataProducts = await res.json();
-      setData(dataProducts.products);
-      let newProduct = [...dataProducts.products];
+      setData(dataProducts);
+      let newProduct = [...dataProducts];
       let pageSize = 10;
       newProduct = newProduct.slice((currentPage - 1) * pageSize, currentPage * pageSize);
       setDataPage(newProduct);
@@ -28,7 +34,7 @@ export default function Dashboard() {
     let newProduct = [...data];
     if (searchValue !== '') {
       newProduct = newProduct.filter((item: any) =>
-        item.title.toLowerCase().includes(searchValue.toLowerCase())
+        item.name.toLowerCase().includes(searchValue.toLowerCase())
       );
     }
 
@@ -89,7 +95,7 @@ export default function Dashboard() {
                     <input
                       type='text'
                       id='simple-search'
-                      className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 block w-full pl-10 p-2  dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-primary-500 dark:focus:border-primary-500'
+                      className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 block w-full pl-10 p-2'
                       placeholder='Search...'
                       onChange={e => setSearchValue(e.target.value)}
                     />
@@ -100,11 +106,6 @@ export default function Dashboard() {
                 <div className='flex items-center justify-between gap-4'>
                   <div>
                     <Button onClick={() => setShowModalCreate(true)}>Add Product</Button>
-                    <CreateModal
-                      showModalCreate={showModalCreate}
-                      setShowModalCreate={setShowModalCreate}
-                      data={data}
-                    />
                   </div>
                   <div className='max-w-md flex items-center justify-between gap-4' id='select'>
                     <Select
@@ -136,24 +137,42 @@ export default function Dashboard() {
                   <Table.Body className='divide-y' key={product.id}>
                     <Table.Row className='bg-white'>
                       <Table.Cell className='whitespace-nowrap font-medium text-gray-900'>
-                        {product.title}
+                        {product.name}
                       </Table.Cell>
                       <Table.Cell>{product.category}</Table.Cell>
-                      <Table.Cell>{product.description}</Table.Cell>
+                      <Table.Cell>{product.description.slice(0, 50)}...</Table.Cell>
                       <Table.Cell>${product.price}</Table.Cell>
                       <Table.Cell>
-                        <Dropdown inline label=''>
-                          <Dropdown.Item onClick={() => setShowModalCreate(true)}>
-                            Edit
-                          </Dropdown.Item>
-                          <Dropdown.Item>View</Dropdown.Item>
-                          <Dropdown.Item>Delete</Dropdown.Item>
-                        </Dropdown>
+                        <div className='flex justify-end gap-4'>
+                          <Button onClick={() => setShowModalUpdate(true)}>Edit</Button>
+                          <Button onClick={() => setShowModalView(true)}>View</Button>
+                          <Button onClick={() => setShowModalDelete(true)}>Delete</Button>
+                        </div>
                       </Table.Cell>
                     </Table.Row>
                   </Table.Body>
                 ))}
               </Table>
+              <CreateModal
+                showModalCreate={showModalCreate}
+                setShowModalCreate={setShowModalCreate}
+                data={data}
+              />
+              <UpdateModal
+                showModalUpdate={showModalUpdate}
+                setShowModalUpdate={setShowModalUpdate}
+                data={data}
+              />
+               <ViewModal
+                showModalView={showModalView}
+                setShowModalView={setShowModalView}
+                data={data}
+              />
+                <DeleteModal
+                showModalDelete={showModalDelete}
+                setShowModalDelete={setShowModalDelete}
+                data={data}
+              />
             </div>
             <nav
               className='flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4'

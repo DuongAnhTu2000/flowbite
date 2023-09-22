@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     env: {
-        API_KEY: 'https://dummyjson.com/products',
+        API_URL: 'https://625bf62850128c570209bacc.mockapi.io',
       },
 }
 

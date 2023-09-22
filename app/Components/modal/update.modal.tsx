@@ -3,38 +3,35 @@ import React, { useState } from 'react';
 import { Button, Label, Modal, TextInput, Textarea } from 'flowbite-react';
 
 interface ModalProps {
-  showModalCreate: boolean;
-  setShowModalCreate: (show: boolean) => void;
+  showModalUpdate: boolean;
+  setShowModalUpdate: (show: boolean) => void;
   data: any[];
 }
 
-export default function CreateModal(prop: ModalProps): JSX.Element {
+export default function UpdateModal(prop: ModalProps): JSX.Element {
   const [form, setForm] = useState<{
     productName: string;
     category: string;
     brand: string;
-    stock: string;
     description: string;
     price: string;
   }>({
     productName: '',
     category: '',
     brand: '',
-    stock: '',
     description: '',
     price: '',
   });
-  const { showModalCreate, setShowModalCreate, data } = prop;
+  const { showModalUpdate, setShowModalUpdate } = prop;
 
   const handleSubmit = (): void => {
     setTimeout(() => {
-      setShowModalCreate(false);
+      setShowModalUpdate(false);
       console.log(
         'check data form',
         form.productName,
         form.category,
         form.brand,
-        form.stock,
         form.description,
         form.price
       );
@@ -46,23 +43,22 @@ export default function CreateModal(prop: ModalProps): JSX.Element {
       productName: '',
       category: '',
       brand: '',
-      stock: '',
       description: '',
       price: '',
     });
-    setShowModalCreate(false);
+    setShowModalUpdate(false);
   };
 
-  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-  //   setForm({ ...form, [e.target.name]: e.target.value });
-  // };
+
   return (
     <>
-      <Modal show={showModalCreate} onClose={() => handleCloseModal()}>
-        <Modal.Header />
+      <Modal show={showModalUpdate} onClose={() => handleCloseModal()}>
+        <Modal.Header>
+        <h3 className='text-xl font-medium text-gray-900 dark:text-white'>Update Product</h3>
+        </Modal.Header>
         <Modal.Body>
           <div className='w-full'>
-            <h3 className='text-xl font-medium text-gray-900 dark:text-white'>Create Product</h3>
+            
             <br />
             <div>
               <div className='mb-2 block'>
@@ -72,11 +68,18 @@ export default function CreateModal(prop: ModalProps): JSX.Element {
                 id='product-name'
                 placeholder='Product Name'
                 required
-                name='title'
+                name='name'
                 value={form.productName}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setForm({ ...form, productName: e.target.value })
-                }
+                // onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                //   setForm((productName: string) => {
+                //     { ...state, productName: e.target.value }
+                //   })
+                // }
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setForm((state) => {
+                    return { ...state, productName: e.target.value };
+                  });
+                }}
               />
             </div>
             <br />
@@ -141,7 +144,7 @@ export default function CreateModal(prop: ModalProps): JSX.Element {
               <TextInput
                 id='price'
                 type='text'
-                placeholder='999$'
+                placeholder='$999'
                 required
                 name='price'
                 value={form.price}
@@ -153,7 +156,7 @@ export default function CreateModal(prop: ModalProps): JSX.Element {
             <br />
             <div>
               <Button className='w-full' onClick={() => handleSubmit()}>
-                Create Product
+                Update Product
               </Button>
             </div>
           </div>
