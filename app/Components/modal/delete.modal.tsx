@@ -5,12 +5,12 @@ import { Button, Modal } from 'flowbite-react';
 interface ModalProps {
   showModalDelete: boolean;
   setShowModalDelete: (show: boolean) => void;
-  data: any[];
+  formData: any[];
 }
 
 export default function DeleteModal(prop: ModalProps): JSX.Element {
 
-  const { showModalDelete, setShowModalDelete, data } = prop;
+  const { showModalDelete, setShowModalDelete, formData } = prop;
 
   const handleSubmit = (): void => {
   

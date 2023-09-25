@@ -5,7 +5,7 @@ import { Button, Label, Modal, TextInput, Textarea } from 'flowbite-react';
 interface ModalProps {
   showModalView: boolean;
   setShowModalView: (show: boolean) => void;
-  data: any[];
+  formData: any[];
 }
 
 export default function ViewModal(prop: ModalProps): JSX.Element {

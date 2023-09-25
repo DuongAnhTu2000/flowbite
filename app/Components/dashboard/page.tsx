@@ -1,43 +1,55 @@
 'use client';
 import { Button, Pagination, Select, Table } from 'flowbite-react';
 import React, { useEffect, useState } from 'react';
-import CreateModal from '../modal/create.modal';
-import UpdateModal from '../modal/update.modal';
-import DeleteModal from '../modal/delete.modal';
-import ViewModal from '../modal/view.modal';
+import CreateModal from '@/Components/modal/create.modal';
+import UpdateModal from '@/Components/modal/update.modal';
+import DeleteModal from '@/Components/modal/delete.modal';
+import ViewModal from '@/Components/modal/view.modal';
+import { useGetProductsQuery } from '@/redux/services/productApi';
+import { useAppSelector } from '@/redux/hook';
+
+interface Product {
+  id: number;
+  name: string;
+  category: string;
+  description: string;
+  price: number;
+  data: any[];
+  dataPage: any[];
+}
 
 export default function Dashboard() {
+  const products = useAppSelector(state => state.productReducer ? state.productReducer.product : undefined);
   const [showModalCreate, setShowModalCreate] = useState<boolean>(false);
   const [showModalUpdate, setShowModalUpdate] = useState<boolean>(false);
   const [showModalView, setShowModalView] = useState<boolean>(false);
   const [showModalDelete, setShowModalDelete] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [dataPage, setDataPage] = useState<any[]>([]);
+  const [dataPage, setDataPage] = useState<Product[]>([]);
   const [searchValue, setSearchValue] = useState<string>('');
   const [sortProduct, setSortProduct] = useState<string>('default');
-  const [data, setData] = useState<any[]>([]);
+  const [formData, setFormData] = useState<any[]>([]);
+
+  const { data } = useGetProductsQuery(null);
 
   useEffect(() => {
-    const getProducts = async () => {
-      const res = await fetch(`${process.env.API_URL}/product`);
-      const dataProducts = await res.json();
-      setData(dataProducts);
-      let newProduct = [...dataProducts];
+
+      let newProduct = Array.isArray(data) ? [...data] : [];
+      console.log('load data 1', newProduct);
       let pageSize = 10;
       newProduct = newProduct.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
       setDataPage(newProduct);
-    };
-    getProducts();
-  }, []);
+  }, [data, currentPage]);
 
   useEffect(() => {
-    let newProduct = [...data];
+    let newProduct = Array.isArray(data) ? [...data] : [];
+    console.log('load data 2', newProduct);
     if (searchValue !== '') {
       newProduct = newProduct.filter((item: any) =>
         item.name.toLowerCase().includes(searchValue.toLowerCase())
       );
     }
-
     if (sortProduct !== '') {
       switch (sortProduct) {
         case 'default':
@@ -57,12 +69,11 @@ export default function Dashboard() {
           break;
       }
     }
-
     let pageSize = 10;
     newProduct = newProduct.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
     setDataPage(newProduct);
-    return () => {};
-  }, [searchValue, sortProduct, currentPage]);
+  }, [searchValue, sortProduct, currentPage,data]);
 
   return (
     <div>
@@ -133,7 +144,7 @@ export default function Dashboard() {
                     <span className='sr-only'>Edit</span>
                   </Table.HeadCell>
                 </Table.Head>
-                {dataPage.map((product: any) => (
+                {dataPage?.map((product: any) => (
                   <Table.Body className='divide-y' key={product.id}>
                     <Table.Row className='bg-white'>
                       <Table.Cell className='whitespace-nowrap font-medium text-gray-900'>
@@ -156,22 +167,22 @@ export default function Dashboard() {
               <CreateModal
                 showModalCreate={showModalCreate}
                 setShowModalCreate={setShowModalCreate}
-                data={data}
+                formData={formData}
               />
               <UpdateModal
                 showModalUpdate={showModalUpdate}
                 setShowModalUpdate={setShowModalUpdate}
-                data={data}
+                formData={formData}
               />
-               <ViewModal
+              <ViewModal
                 showModalView={showModalView}
                 setShowModalView={setShowModalView}
-                data={data}
+                formData={formData}
               />
-                <DeleteModal
+              <DeleteModal
                 showModalDelete={showModalDelete}
                 setShowModalDelete={setShowModalDelete}
-                data={data}
+                formData={formData}
               />
             </div>
             <nav
@@ -189,7 +200,7 @@ export default function Dashboard() {
                 onPageChange={page => {
                   setCurrentPage(page);
                 }}
-                totalPages={3}
+                totalPages={4}
               />
             </nav>
           </div>

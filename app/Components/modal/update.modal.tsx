@@ -5,7 +5,7 @@ import { Button, Label, Modal, TextInput, Textarea } from 'flowbite-react';
 interface ModalProps {
   showModalUpdate: boolean;
   setShowModalUpdate: (show: boolean) => void;
-  data: any[];
+  formData: any[];
 }
 
 export default function UpdateModal(prop: ModalProps): JSX.Element {
@@ -28,7 +28,7 @@ export default function UpdateModal(prop: ModalProps): JSX.Element {
     setTimeout(() => {
       setShowModalUpdate(false);
       console.log(
-        'check data form',
+        'check formData form',
         form.productName,
         form.category,
         form.brand,
