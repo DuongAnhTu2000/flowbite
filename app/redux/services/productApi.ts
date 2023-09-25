@@ -20,14 +20,13 @@ type ProductState = {
 
 export const productApi = createApi({
   reducerPath: "productApi",
-  refetchOnFocus: true,
   baseQuery: fetchBaseQuery({
     baseUrl: `${process.env.API_URL}`,
   }),
   endpoints: (builder) => ({
     getProducts: builder.query<ProductState, null>({
       query: () => ({
-        url: `${process.env.API_URL}/product`,
+        url: `/product`,
         method: 'GET',
       }),
     }),

@@ -31,7 +31,6 @@ export default function Dashboard() {
   const [formData, setFormData] = useState<any[]>([]);
 
   const { data } = useGetProductsQuery(null);
-
   useEffect(() => {
 
       let newProduct = Array.isArray(data) ? [...data] : [];
@@ -44,7 +43,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     let newProduct = Array.isArray(data) ? [...data] : [];
-    console.log('load data 2', newProduct);
     if (searchValue !== '') {
       newProduct = newProduct.filter((item: any) =>
         item.name.toLowerCase().includes(searchValue.toLowerCase())

@@ -38,7 +38,6 @@ export default function CreateModal(prop: ModalProps): JSX.Element {
       ...form,
     };
     dispatch(addProduct(addUser));
-    console.log(dispatch(addProduct(addUser)));
     setShowModalCreate(false);
     setForm({
       name: '',
