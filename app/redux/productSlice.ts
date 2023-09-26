@@ -1,13 +1,10 @@
-import { PayloadAction, createSlice, Slice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
-  category: string;
-  brand: string;
-  stock: string;
-  description: string;
-  price: string;
+  price: number;
 }
 
 interface ProductState {
@@ -16,69 +13,94 @@ interface ProductState {
   error: boolean;
 }
 
-const initialState: ProductState = {
-  product: [],
-  isFetching: false,
-  error: false,
-};
+export const getProducts = createAsyncThunk('product', async () => {
+  try {
+    const res = await axios.get<Product[]>(`${process.env.API_URL}/product`);
+    console.log(res)
+    return res?.data;
+  } catch (err) {
+    console.log(err);
+  }
+});
+export const addProducts = createAsyncThunk('product/add', async () => {
+  try {
+    const res = await axios.post<Product>(`${process.env.API_URL}/product`);
+    return res?.data;
+  } catch (err) {
+    console.log(err);
+  }
+});
 
-export const productSlice: Slice<ProductState> = createSlice({
+export const updateProducts = createAsyncThunk('product/update', async id => {
+  try {
+    const res = await axios.put<Product>(`${process.env.API_URL}/${id}`);
+    return res?.data;
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+export const deleteProducts = createAsyncThunk('product/delete', async (id: string) => {
+  try {
+    const res = await axios.delete(`${process.env.API_URL}/${id}`);
+    return res?.data;
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+const productSlice = createSlice({
   name: 'product',
-  initialState,
-  reducers: {
-    getProducts: state => {
+  initialState: {
+    product: [],
+    isFetching: false,
+    error: false,
+  } as ProductState,
+
+  reducers: {},
+
+  extraReducers: builder => {
+    builder.addCase(getProducts.pending, (state, action) => {
       state.isFetching = true;
-    },
-    getProductsSuccess: (state, { payload }: PayloadAction<Product[]>) => {
-      state.product = payload;
+      state.error = false;
+    });
+
+    builder.addCase(getProducts.fulfilled, (state, action) => {
+      state.product = action.payload as Product[];
       state.isFetching = false;
       state.error = false;
-    },
-    getProductsFailure: state => {
+    });
+
+    builder.addCase(getProducts.rejected, (state, action) => {
       state.isFetching = false;
       state.error = true;
-    },
-    addProductsPending: state => {
-      state.isFetching = true;
-    },
-    addProduct: (state, action) => {
-      state.isFetching = false;
-      state.product.push(action.payload);
-    },
-    addProductFailure: state => {
-      state.isFetching = false;
-      state.error = true;
-    },
-    updateProductsPending: state => {
-      state.isFetching = true;
-    },
-    updateProduct: (state, { payload }: PayloadAction<Product>) => {
-      const index = state.product.findIndex(item => item.id === payload.id);
-      state.product[index] = payload;
-    },
-    updateFailure: state => {
-      state.isFetching = false;
-      state.error = true;
-    },
-    deleteProductsPending: state => {
-      state.isFetching = true;
-    },
-    deleteProduct: (state, { payload }: PayloadAction<number>) => {
-      const index = state.product.findIndex(item => item.id === payload);
-      state.product.splice(index, 1);
-    },
-    deleteFailure: state => {
-      state.isFetching = false;
-      state.error = true;
-    },
+    });
+
+    builder.addCase(addProducts.fulfilled, (state, { payload }) => {
+      if (payload) {
+        state.product.push(payload);
+      }
+    });
+
+    builder.addCase(updateProducts.fulfilled, (state, { payload }) => {
+      if (payload) {
+        const index = state.product.findIndex(item => item.id === payload.id);
+        if (index !== -1) {
+          state.product[index] = payload;
+        }
+      }
+    });
+
+    builder.addCase(deleteProducts.fulfilled, (state, { payload }) => {
+      if (payload) {
+        const index = state.product.findIndex(item => item.id === payload.id);
+        if (index !== -1) {
+          state.product.splice(index, 1);
+        }
+      }
+    });
   },
 });
 
-export const {
-  getProducts,
-  addProduct,
-  updateProduct,
-  deleteProduct,
-} = productSlice.actions;
-
+export const productReducer = productSlice.actions;
 export default productSlice.reducer;

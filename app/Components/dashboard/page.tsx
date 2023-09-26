@@ -5,8 +5,8 @@ import CreateModal from '@/Components/modal/create.modal';
 import UpdateModal from '@/Components/modal/update.modal';
 import DeleteModal from '@/Components/modal/delete.modal';
 import ViewModal from '@/Components/modal/view.modal';
-import { useGetProductsQuery } from '@/redux/services/productApi';
-import { useAppSelector } from '@/redux/hook';
+import { useAppSelector,useAppDispatch } from '@/redux/hook';
+import { getProducts } from '@/redux/productSlice';
 
 interface Product {
   id: number;
@@ -14,12 +14,13 @@ interface Product {
   category: string;
   description: string;
   price: number;
-  data: any[];
   dataPage: any[];
 }
 
 export default function Dashboard() {
-  const products = useAppSelector(state => state.productReducer ? state.productReducer.product : undefined);
+const {product} = useAppSelector(state => state.product);
+  const dispatch = useAppDispatch();
+
   const [showModalCreate, setShowModalCreate] = useState<boolean>(false);
   const [showModalUpdate, setShowModalUpdate] = useState<boolean>(false);
   const [showModalView, setShowModalView] = useState<boolean>(false);
@@ -30,48 +31,47 @@ export default function Dashboard() {
   const [sortProduct, setSortProduct] = useState<string>('default');
   const [formData, setFormData] = useState<any[]>([]);
 
-  const { data } = useGetProductsQuery(null);
   useEffect(() => {
-
-      let newProduct = Array.isArray(data) ? [...data] : [];
-      console.log('load data 1', newProduct);
+    dispatch(getProducts());
+      let newProduct = Array.isArray(product) ? [...product] : [];
       let pageSize = 10;
       newProduct = newProduct.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
       setDataPage(newProduct);
-  }, [data, currentPage]);
+  }, [currentPage]);
 
-  useEffect(() => {
-    let newProduct = Array.isArray(data) ? [...data] : [];
-    if (searchValue !== '') {
-      newProduct = newProduct.filter((item: any) =>
-        item.name.toLowerCase().includes(searchValue.toLowerCase())
-      );
-    }
-    if (sortProduct !== '') {
-      switch (sortProduct) {
-        case 'default':
-          newProduct = newProduct.sort((a, b) => {
-            return a.id > b.id ? 1 : -1;
-          });
-          break;
-        case 'ascending':
-          newProduct = newProduct.sort((a, b) => {
-            return a.price - b.price;
-          });
-          break;
-        case 'descending':
-          newProduct = newProduct.sort((a, b) => {
-            return b.price - a.price;
-          });
-          break;
-      }
-    }
-    let pageSize = 10;
-    newProduct = newProduct.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
-    setDataPage(newProduct);
-  }, [searchValue, sortProduct, currentPage,data]);
+  // useEffect(() => {
+  //   let newProduct = Array.isArray(products) ? [...products] : [];
+  //   if (searchValue !== '') {
+  //     newProduct = newProduct.filter((item: any) =>
+  //       item.name.toLowerCase().includes(searchValue.toLowerCase())
+  //     );
+  //   }
+  //   if (sortProduct !== '') {
+  //     switch (sortProduct) {
+  //       case 'default':
+  //         newProduct = newProduct.sort((a, b) => {
+  //           return a.id > b.id ? 1 : -1;
+  //         });
+  //         break;
+  //       case 'ascending':
+  //         newProduct = newProduct.sort((a, b) => {
+  //           return a.price - b.price;
+  //         });
+  //         break;
+  //       case 'descending':
+  //         newProduct = newProduct.sort((a, b) => {
+  //           return b.price - a.price;
+  //         });
+  //         break;
+  //     }
+  //   }
+  //   // let pageSize = 10;
+  //   // newProduct = newProduct.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  //   // setDataPage(newProduct);
+  // }, [searchValue, sortProduct, currentPage,products]);
 
   return (
     <div>
@@ -142,7 +142,7 @@ export default function Dashboard() {
                     <span className='sr-only'>Edit</span>
                   </Table.HeadCell>
                 </Table.Head>
-                {dataPage?.map((product: any) => (
+                {product?.map((product: any) => (
                   <Table.Body className='divide-y' key={product.id}>
                     <Table.Row className='bg-white'>
                       <Table.Cell className='whitespace-nowrap font-medium text-gray-900'>
@@ -199,6 +199,7 @@ export default function Dashboard() {
                   setCurrentPage(page);
                 }}
                 totalPages={4}
+                showIcons
               />
             </nav>
           </div>

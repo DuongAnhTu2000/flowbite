@@ -1,27 +1,27 @@
 'use client';
 import React, { useState } from 'react';
 import { Button, Label, Modal, TextInput, Textarea } from 'flowbite-react';
-import { addProduct } from '@/redux/productSlice';
-import { useAppDispatch} from '@/redux/hook';
+import { addProducts } from '@/redux/productSlice';
+import { useAppDispatch } from '@/redux/hook';
 
 interface ModalProps {
   showModalCreate: boolean;
   setShowModalCreate: (show: boolean) => void;
   formData: any[];
 }
-interface formData {
-    name: string;
-    category: string;
-    brand: string;
-    stock: string;
-    description: string;
-    price: string;
+interface FormData {
+  name: string;
+  category: string;
+  brand: string;
+  stock: string;
+  description: string;
+  price: string;
 }
 
 export default function CreateModal(prop: ModalProps): JSX.Element {
   const dispatch = useAppDispatch();
 
-  const [form, setForm] = useState<formData>({
+  const [form, setForm] = useState<FormData>({
     name: '',
     category: '',
     brand: '',
@@ -32,12 +32,12 @@ export default function CreateModal(prop: ModalProps): JSX.Element {
 
   const { showModalCreate, setShowModalCreate } = prop;
 
-  const handleSubmit = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    const addUser = {
+  const handleSubmit = async () => {
+    let addUser: FormData = {
       ...form,
     };
-    dispatch(addProduct(addUser));
+    console.log(addUser);
+    await dispatch(addProducts(addUser));
     setShowModalCreate(false);
     setForm({
       name: '',
@@ -68,7 +68,7 @@ export default function CreateModal(prop: ModalProps): JSX.Element {
           {/* <h3 className='text-xl font-medium text-gray-900 dark:text-white'>Create Product</h3> */}
         </Modal.Header>
         <Modal.Body>
-            <form onSubmit={(e: any) => handleSubmit(e)}>
+          <form onSubmit={() => handleSubmit()}>
             <div className='w-full'>
               <br />
               <div>
