@@ -1,64 +1,91 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Label, Modal, TextInput, Textarea } from 'flowbite-react';
+import { updateProducts } from '@/redux/productSlice';
+import { useAppDispatch, useAppSelector } from '@/redux/hook';
+import { useParams } from 'next/navigation';
+import { RootState } from '@/redux/store';
 
 interface ModalProps {
   showModalUpdate: boolean;
-  setShowModalUpdate: (show: boolean) => void;
-  formData: any[];
+  setShowModalUpdate: (value: boolean) => void;
+  data: IProduct | null;
+  setData: (value: IProduct | null) => void;
 }
 
-export default function UpdateModal(prop: ModalProps): JSX.Element {
+export default function UpdateModal(prop: ModalProps) {
+  const { showModalUpdate, setShowModalUpdate, data, setData } = prop;
+  const params = useParams();
+  const dispatch = useAppDispatch();
+  const { product } = useAppSelector((state: RootState) => state.product);
   const [form, setForm] = useState<{
-    productName: string;
+    id: number;
+    name: string;
     category: string;
     brand: string;
     description: string;
     price: string;
   }>({
-    productName: '',
+    id: 0,
+    name: '',
     category: '',
     brand: '',
     description: '',
     price: '',
   });
-  const { showModalUpdate, setShowModalUpdate } = prop;
 
-  const handleSubmit = (): void => {
-    setTimeout(() => {
-      setShowModalUpdate(false);
-      console.log(
-        'check formData form',
-        form.productName,
-        form.category,
-        form.brand,
-        form.description,
-        form.price
-      );
-    }, 1000);
+  const handleUpdateProduct = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+    let editUser = {
+      ...form,
+    };
+    await dispatch(updateProducts(editUser as IProduct));
+    setShowModalUpdate(false);
+    // setForm({
+    //   id: 0,
+    //   name: '',
+    //   category: '',
+    //   brand: '',
+    //   description: '',
+    //   price: '',
+    // });
   };
 
   const handleCloseModal = (): void => {
     setForm({
-      productName: '',
+      id: 0,
+      name: '',
       category: '',
       brand: '',
       description: '',
       price: '',
     });
     setShowModalUpdate(false);
+    setData(null);
   };
 
-
+  useEffect(() => {
+    if (data && data.id) {
+      setForm({
+        id: data.id,
+        name: data.name,
+        category: data.category,
+        brand: data.brand,
+        description: data.description,
+        price: data.price,
+      });
+    }
+  }, [data]);
   return (
     <>
       <Modal show={showModalUpdate} onClose={() => handleCloseModal()}>
         <Modal.Header>
-        <h3 className='text-xl font-medium text-gray-900 dark:text-white'>Update Product</h3>
+          <span>
+            <h3 className='text-xl font-medium text-gray-900 dark:text-white'>Update Product</h3>
+          </span>
         </Modal.Header>
         <Modal.Body>
           <div className='w-full'>
-            
             <br />
             <div>
               <div className='mb-2 block'>
@@ -69,15 +96,10 @@ export default function UpdateModal(prop: ModalProps): JSX.Element {
                 placeholder='Product Name'
                 required
                 name='name'
-                value={form.productName}
-                // onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                //   setForm((productName: string) => {
-                //     { ...state, productName: e.target.value }
-                //   })
-                // }
+                value={form.name}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setForm((state) => {
-                    return { ...state, productName: e.target.value };
+                  setForm(form => {
+                    return { ...form, name: e.target.value };
                   });
                 }}
               />
@@ -95,9 +117,11 @@ export default function UpdateModal(prop: ModalProps): JSX.Element {
                 required
                 name='category'
                 value={form.category}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setForm({ ...form, category: e.target.value })
-                }
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setForm(form => {
+                    return { ...form, category: e.target.value };
+                  });
+                }}
               />
             </div>
             <br />
@@ -113,9 +137,11 @@ export default function UpdateModal(prop: ModalProps): JSX.Element {
                 required
                 name='brand'
                 value={form.brand}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setForm({ ...form, brand: e.target.value })
-                }
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setForm(form => {
+                    return { ...form, brand: e.target.value };
+                  });
+                }}
               />
             </div>
             <div>
@@ -126,13 +152,16 @@ export default function UpdateModal(prop: ModalProps): JSX.Element {
               <br />
               <Textarea
                 id='description'
+                type='text'
                 placeholder='Apple iphone'
                 required
                 name='description'
                 value={form.description}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                  setForm({ ...form, description: e.target.value })
-                }
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setForm(form => {
+                    return { ...form, description: e.target.value };
+                  });
+                }}
               />
             </div>
             <div>
@@ -143,19 +172,26 @@ export default function UpdateModal(prop: ModalProps): JSX.Element {
               <br />
               <TextInput
                 id='price'
-                type='text'
+                type='number'
                 placeholder='$999'
                 required
                 name='price'
                 value={form.price}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setForm({ ...form, price: e.target.value })
-                }
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setForm(form => {
+                    return { ...form, price: e.target.value };
+                  });
+                }}
               />
             </div>
             <br />
             <div>
-              <Button className='w-full' onClick={() => handleSubmit()}>
+              <Button
+                className='w-full'
+                onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) =>
+                  handleUpdateProduct(e)
+                }
+              >
                 Update Product
               </Button>
             </div>

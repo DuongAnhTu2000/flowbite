@@ -1,24 +1,19 @@
 'use client';
 import { Button, Pagination, Select, Table } from 'flowbite-react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,SetStateAction } from 'react';
 import CreateModal from '@/Components/modal/create.modal';
 import UpdateModal from '@/Components/modal/update.modal';
 import DeleteModal from '@/Components/modal/delete.modal';
 import ViewModal from '@/Components/modal/view.modal';
-import { useAppSelector,useAppDispatch } from '@/redux/hook';
+import { useAppSelector, useAppDispatch } from '@/redux/hook';
 import { getProducts } from '@/redux/productSlice';
+import { RootState } from '@/redux/store';
 
-interface Product {
-  id: number;
-  name: string;
-  category: string;
-  description: string;
-  price: number;
-  dataPage: any[];
+interface Props {
+  products: Product
 }
-
-export default function Dashboard() {
-const {product} = useAppSelector(state => state.product);
+export default function Dashboard(props: Props) {
+  const { product } = useAppSelector((state: RootState) => state.product);
   const dispatch = useAppDispatch();
 
   const [showModalCreate, setShowModalCreate] = useState<boolean>(false);
@@ -29,49 +24,50 @@ const {product} = useAppSelector(state => state.product);
   const [dataPage, setDataPage] = useState<Product[]>([]);
   const [searchValue, setSearchValue] = useState<string>('');
   const [sortProduct, setSortProduct] = useState<string>('default');
-  const [formData, setFormData] = useState<any[]>([]);
+  const [data, setData] = useState<Product | null>([]);
 
   useEffect(() => {
     dispatch(getProducts());
-      let newProduct = Array.isArray(product) ? [...product] : [];
-      let pageSize = 10;
-      newProduct = newProduct.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+    let newProduct = Array.isArray(product) ? [...product] : [];
+    let pageSize = 10;
+    newProduct = newProduct.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
-      setDataPage(newProduct);
+    setDataPage(newProduct);
   }, [currentPage]);
 
+  useEffect(() => {
+    let newProduct = Array.isArray(product) ? [...product] : [];
+    console.log(newProduct);
+    
+    if (searchValue !== '') {
+      newProduct = newProduct.filter((item: any) =>
+        item.name.toLowerCase().includes(searchValue.toLowerCase())
+      );
+    }
+    if (sortProduct !== '') {
+      switch (sortProduct) {
+        case 'default':
+          newProduct = newProduct.sort((a, b) => {
+            return a.id > b.id ? 1 : -1;
+          });
+          break;
+        case 'ascending':
+          newProduct = newProduct.sort((a: Product, b: Product) => {
+            return a.price - b.price;
+          });
+          break;
+        case 'descending':
+          newProduct = newProduct.sort((a: Product, b: Product) => {
+            return b.price - a.price;
+          });
+          break;
+      }
+    }
+    let pageSize = 10;
+    newProduct = newProduct.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
-  // useEffect(() => {
-  //   let newProduct = Array.isArray(products) ? [...products] : [];
-  //   if (searchValue !== '') {
-  //     newProduct = newProduct.filter((item: any) =>
-  //       item.name.toLowerCase().includes(searchValue.toLowerCase())
-  //     );
-  //   }
-  //   if (sortProduct !== '') {
-  //     switch (sortProduct) {
-  //       case 'default':
-  //         newProduct = newProduct.sort((a, b) => {
-  //           return a.id > b.id ? 1 : -1;
-  //         });
-  //         break;
-  //       case 'ascending':
-  //         newProduct = newProduct.sort((a, b) => {
-  //           return a.price - b.price;
-  //         });
-  //         break;
-  //       case 'descending':
-  //         newProduct = newProduct.sort((a, b) => {
-  //           return b.price - a.price;
-  //         });
-  //         break;
-  //     }
-  //   }
-  //   // let pageSize = 10;
-  //   // newProduct = newProduct.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-
-  //   // setDataPage(newProduct);
-  // }, [searchValue, sortProduct, currentPage,products]);
+    setDataPage(newProduct);
+  }, [searchValue, sortProduct, currentPage, product]);
 
   return (
     <div>
@@ -106,6 +102,7 @@ const {product} = useAppSelector(state => state.product);
                       id='simple-search'
                       className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 block w-full pl-10 p-2'
                       placeholder='Search...'
+                      // value={searchValue}
                       onChange={e => setSearchValue(e.target.value)}
                     />
                   </div>
@@ -142,7 +139,7 @@ const {product} = useAppSelector(state => state.product);
                     <span className='sr-only'>Edit</span>
                   </Table.HeadCell>
                 </Table.Head>
-                {product?.map((product: any) => (
+                {dataPage?.map((product: any) => (
                   <Table.Body className='divide-y' key={product.id}>
                     <Table.Row className='bg-white'>
                       <Table.Cell className='whitespace-nowrap font-medium text-gray-900'>
@@ -154,7 +151,10 @@ const {product} = useAppSelector(state => state.product);
                       <Table.Cell>
                         <div className='flex justify-end gap-4'>
                           <Button onClick={() => setShowModalUpdate(true)}>Edit</Button>
-                          <Button onClick={() => setShowModalView(true)}>View</Button>
+                          <Button onClick={() => {
+                            setData(product);
+                            setShowModalView(true)
+                          }}>View</Button>
                           <Button onClick={() => setShowModalDelete(true)}>Delete</Button>
                         </div>
                       </Table.Cell>
@@ -165,22 +165,24 @@ const {product} = useAppSelector(state => state.product);
               <CreateModal
                 showModalCreate={showModalCreate}
                 setShowModalCreate={setShowModalCreate}
-                formData={formData}
               />
               <UpdateModal
                 showModalUpdate={showModalUpdate}
                 setShowModalUpdate={setShowModalUpdate}
-                formData={formData}
+                data={data}
+                setData={setData}
               />
               <ViewModal
                 showModalView={showModalView}
                 setShowModalView={setShowModalView}
-                formData={formData}
+                data={data}
+                setData={setData}
               />
               <DeleteModal
                 showModalDelete={showModalDelete}
                 setShowModalDelete={setShowModalDelete}
-                formData={formData}
+                data={data}
+                setData={setData}
               />
             </div>
             <nav

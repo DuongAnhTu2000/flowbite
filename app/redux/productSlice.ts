@@ -1,48 +1,43 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+
 import axios from 'axios';
 
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-}
-
 interface ProductState {
-  product: Product[];
+  product: IProduct[];
   isFetching: boolean;
   error: boolean;
 }
 
 export const getProducts = createAsyncThunk('product', async () => {
   try {
-    const res = await axios.get<Product[]>(`${process.env.API_URL}/product`);
-    console.log(res)
+    const res = await axios.get<IProduct[]>(`${process.env.API_URL}/product`);
     return res?.data;
   } catch (err) {
     console.log(err);
   }
 });
-export const addProducts = createAsyncThunk('product/add', async () => {
+export const addProducts = createAsyncThunk('product/add', async (addUser: IProduct) => {
   try {
-    const res = await axios.post<Product>(`${process.env.API_URL}/product`);
-    return res?.data;
-  } catch (err) {
-    console.log(err);
-  }
-});
-
-export const updateProducts = createAsyncThunk('product/update', async id => {
-  try {
-    const res = await axios.put<Product>(`${process.env.API_URL}/${id}`);
+    const res = await axios.post<IProduct>(`${process.env.API_URL}/product`, addUser);
     return res?.data;
   } catch (err) {
     console.log(err);
   }
 });
 
-export const deleteProducts = createAsyncThunk('product/delete', async (id: string) => {
+export const updateProducts = createAsyncThunk('product/update', async (id: number, editUser) => {
   try {
-    const res = await axios.delete(`${process.env.API_URL}/${id}`);
+    const res = await axios.put<IProduct>(`${process.env.API_URL}/product/${id}`, id);
+    console.log(res);
+    return res?.data;
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+export const deleteProducts = createAsyncThunk('product/delete', async (id: number) => {
+  try {
+    const res = await axios.delete(`${process.env.API_URL}/product/${id}`);
     return res?.data;
   } catch (err) {
     console.log(err);
@@ -66,7 +61,7 @@ const productSlice = createSlice({
     });
 
     builder.addCase(getProducts.fulfilled, (state, action) => {
-      state.product = action.payload as Product[];
+      state.product = action.payload as IProduct[];
       state.isFetching = false;
       state.error = false;
     });

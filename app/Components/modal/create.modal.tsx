@@ -1,49 +1,37 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState,MouseEventHandler } from 'react';
 import { Button, Label, Modal, TextInput, Textarea } from 'flowbite-react';
 import { addProducts } from '@/redux/productSlice';
 import { useAppDispatch } from '@/redux/hook';
-
 interface ModalProps {
   showModalCreate: boolean;
   setShowModalCreate: (show: boolean) => void;
-  formData: any[];
-}
-interface FormData {
-  name: string;
-  category: string;
-  brand: string;
-  stock: string;
-  description: string;
-  price: string;
 }
 
-export default function CreateModal(prop: ModalProps): JSX.Element {
+export default function CreateModal(prop: ModalProps) {
   const dispatch = useAppDispatch();
 
-  const [form, setForm] = useState<FormData>({
+  const [form, setForm] = useState<IFormData>({
     name: '',
     category: '',
     brand: '',
-    stock: '',
     description: '',
     price: '',
   });
 
   const { showModalCreate, setShowModalCreate } = prop;
 
-  const handleSubmit = async () => {
-    let addUser: FormData = {
+  const handleAddProduct = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+    let addUser = {
       ...form,
     };
-    console.log(addUser);
-    await dispatch(addProducts(addUser));
+    await dispatch(addProducts(addUser as IProduct));
     setShowModalCreate(false);
     setForm({
       name: '',
       category: '',
       brand: '',
-      stock: '',
       description: '',
       price: '',
     });
@@ -54,7 +42,6 @@ export default function CreateModal(prop: ModalProps): JSX.Element {
       name: '',
       category: '',
       brand: '',
-      stock: '',
       description: '',
       price: '',
     });
@@ -65,10 +52,12 @@ export default function CreateModal(prop: ModalProps): JSX.Element {
     <>
       <Modal show={showModalCreate} onClose={() => handleCloseModal()}>
         <Modal.Header>
-          {/* <h3 className='text-xl font-medium text-gray-900 dark:text-white'>Create Product</h3> */}
+          <span>
+          <h3 className='text-xl font-medium text-gray-900 dark:text-white'>Create Product</h3>
+          </span>
         </Modal.Header>
         <Modal.Body>
-          <form onSubmit={() => handleSubmit()}>
+          <form>
             <div className='w-full'>
               <br />
               <div>
@@ -159,7 +148,10 @@ export default function CreateModal(prop: ModalProps): JSX.Element {
               </div>
               <br />
               <div>
-                <Button className='w-full' type='submit'>
+                <Button
+                  className='w-full'
+                  onClick={(e) => handleAddProduct(e)}
+                >
                   Create Product
                 </Button>
               </div>

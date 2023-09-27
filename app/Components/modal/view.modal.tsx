@@ -4,8 +4,9 @@ import { Button, Label, Modal, TextInput, Textarea } from 'flowbite-react';
 
 interface ModalProps {
   showModalView: boolean;
-  setShowModalView: (show: boolean) => void;
-  formData: any[];
+  setShowModalView: (value: boolean) => void;
+  data: Product | null;
+  setData: (value: Product | null) => void;
 }
 
 export default function ViewModal(prop: ModalProps): JSX.Element {
@@ -24,7 +25,7 @@ export default function ViewModal(prop: ModalProps): JSX.Element {
     description: '',
     price: '',
   });
-  const { showModalView, setShowModalView } = prop;
+  const { showModalView, setShowModalView, setData, data } = prop;
 
   const handleSubmit = (): void => {
     setTimeout(() => {
@@ -141,7 +142,7 @@ export default function ViewModal(prop: ModalProps): JSX.Element {
               <br />
               <TextInput
                 id='price'
-                type='text'
+                type='number'
                 placeholder='$999'
                 required
                 name='price'
