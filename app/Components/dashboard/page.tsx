@@ -10,7 +10,7 @@ import { getProducts } from '@/redux/productSlice';
 import { RootState } from '@/redux/store';
 
 interface Props {
-  products: Product
+  products: IProduct
 }
 export default function Dashboard(props: Props) {
   const { product } = useAppSelector((state: RootState) => state.product);
@@ -21,10 +21,10 @@ export default function Dashboard(props: Props) {
   const [showModalView, setShowModalView] = useState<boolean>(false);
   const [showModalDelete, setShowModalDelete] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [dataPage, setDataPage] = useState<Product[]>([]);
+  const [dataPage, setDataPage] = useState<IProduct[]>([]);
   const [searchValue, setSearchValue] = useState<string>('');
   const [sortProduct, setSortProduct] = useState<string>('default');
-  const [data, setData] = useState<Product | null>([]);
+  const [data, setData] = useState<IProduct | null>([]);
 
   useEffect(() => {
     dispatch(getProducts());
@@ -52,12 +52,12 @@ export default function Dashboard(props: Props) {
           });
           break;
         case 'ascending':
-          newProduct = newProduct.sort((a: Product, b: Product) => {
+          newProduct = newProduct.sort((a: IProduct, b: IProduct) => {
             return a.price - b.price;
           });
           break;
         case 'descending':
-          newProduct = newProduct.sort((a: Product, b: Product) => {
+          newProduct = newProduct.sort((a: IProduct, b: IProduct) => {
             return b.price - a.price;
           });
           break;
