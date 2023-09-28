@@ -17,7 +17,7 @@ export default function UpdateModal(prop: ModalProps) {
   const { showModalUpdate, setShowModalUpdate, data, setData } = prop;
   const params = useParams();
   const dispatch = useAppDispatch();
-  const { product } = useAppSelector((state: RootState) => state.product);
+  const { product, isFetching } = useAppSelector((state: RootState) => state.product);
   const [form, setForm] = useState<{
     id: number;
     name: string;
@@ -34,11 +34,27 @@ export default function UpdateModal(prop: ModalProps) {
     price: '',
   });
 
+  useEffect(() => {
+    product.map((item: IProduct) => {
+      if (item.id === params) {
+        setForm({
+          id: item.id,
+          name: item.name,
+          category: item.category,
+          brand: item.brand,
+          description: item.description,
+          price: item.price,
+        });
+      }
+    });
+  }, [isFetching]);
+
   const handleUpdateProduct = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     let editUser = {
       ...form,
     };
+    console.log(editUser);
     await dispatch(updateProducts(editUser as IProduct));
     setShowModalUpdate(false);
     // setForm({
@@ -64,18 +80,6 @@ export default function UpdateModal(prop: ModalProps) {
     setData(null);
   };
 
-  useEffect(() => {
-    if (data && data.id) {
-      setForm({
-        id: data.id,
-        name: data.name,
-        category: data.category,
-        brand: data.brand,
-        description: data.description,
-        price: data.price,
-      });
-    }
-  }, [data]);
   return (
     <>
       <Modal show={showModalUpdate} onClose={() => handleCloseModal()}>
@@ -152,16 +156,13 @@ export default function UpdateModal(prop: ModalProps) {
               <br />
               <Textarea
                 id='description'
-                type='text'
                 placeholder='Apple iphone'
                 required
                 name='description'
                 value={form.description}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setForm(form => {
-                    return { ...form, description: e.target.value };
-                  });
-                }}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  setForm({ ...form, description: e.target.value })
+                }
               />
             </div>
             <div>

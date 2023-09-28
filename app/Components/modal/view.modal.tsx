@@ -1,15 +1,23 @@
 'use client';
 import React, { useState } from 'react';
 import { Button, Label, Modal, TextInput, Textarea } from 'flowbite-react';
+// import { getProductsId } from '@/redux/productSlice';
+import { useParams } from 'next/navigation';
+import { useAppDispatch, useAppSelector } from '@/redux/hook';
+import { RootState } from '@/redux/store';
 
 interface ModalProps {
   showModalView: boolean;
   setShowModalView: (value: boolean) => void;
-  data: Product | null;
-  setData: (value: Product | null) => void;
+  data: IProduct | null;
+  setData: (value: IProduct | null) => void;
 }
 
 export default function ViewModal(prop: ModalProps): JSX.Element {
+  const params = useParams();
+  const dispatch = useAppDispatch();
+  const { product, isFetchProductID } = useAppSelector((state: RootState) => state.product);
+  
   const [form, setForm] = useState<{
     productName: string;
     category: string;
@@ -54,14 +62,14 @@ export default function ViewModal(prop: ModalProps): JSX.Element {
     setShowModalView(false);
   };
 
-  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-  //   setForm({ ...form, [e.target.name]: e.target.value });
-  // };
+
   return (
     <>
       <Modal show={showModalView} onClose={() => handleCloseModal()}>
         <Modal.Header>
+          <span>
           <h3 className='text-xl font-medium text-gray-900 dark:text-white'>View Product</h3>
+          </span>
         </Modal.Header>
         <Modal.Body>
           <div className='w-full'>

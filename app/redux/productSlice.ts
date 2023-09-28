@@ -5,6 +5,7 @@ import axios from 'axios';
 interface ProductState {
   product: IProduct[];
   isFetching: boolean;
+  isFetchProductID: boolean;
   error: boolean;
 }
 
@@ -16,6 +17,16 @@ export const getProducts = createAsyncThunk('product', async () => {
     console.log(err);
   }
 });
+
+export const getProductsId = createAsyncThunk('product', async id => {
+  try {
+    const res = await axios.get<IProduct[]>(`${process.env.API_URL}/product/${id}`);
+    return res?.data;
+  } catch (err) {
+    console.log(err);
+  }
+});
+
 export const addProducts = createAsyncThunk('product/add', async (addUser: IProduct) => {
   try {
     const res = await axios.post<IProduct>(`${process.env.API_URL}/product`, addUser);
@@ -27,7 +38,7 @@ export const addProducts = createAsyncThunk('product/add', async (addUser: IProd
 
 export const updateProducts = createAsyncThunk('product/update', async (id: number, editUser) => {
   try {
-    const res = await axios.put<IProduct>(`${process.env.API_URL}/product/${id}`, id);
+    const res = await axios.put<IProduct>(`${process.env.API_URL}/product/${editUser.id}`, editUser);
     console.log(res);
     return res?.data;
   } catch (err) {
@@ -49,6 +60,7 @@ const productSlice = createSlice({
   initialState: {
     product: [],
     isFetching: false,
+    isFetchProductID: false,
     error: false,
   } as ProductState,
 
@@ -70,6 +82,21 @@ const productSlice = createSlice({
       state.isFetching = false;
       state.error = true;
     });
+
+    // builder.addCase(getProductsId.pending, (state, action) => {
+    //   state.isFetchProductID = true;
+    // });
+
+    // builder.addCase(getProductsId.fulfilled, (state, action) => {
+    //   state.isFetchProductID = false
+    //   state.product = action.payload as IProduct[];
+    //   state.error = false;
+    // });
+
+    // builder.addCase(getProductsId.rejected, (state, action) => {
+    //   state.isFetchProductID = false;
+    //   state.error = true;
+    // });
 
     builder.addCase(addProducts.fulfilled, (state, { payload }) => {
       if (payload) {

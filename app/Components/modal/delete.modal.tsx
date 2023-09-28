@@ -6,8 +6,8 @@ import { useAppDispatch } from '@/redux/hook';
 interface ModalProps {
   showModalDelete: boolean;
   setShowModalDelete: (show: boolean) => void;
-  data: Product | null;
-  setData: (value: Product | null) => void;
+  data: IProduct | null;
+  setData: (value: IProduct | null) => void;
 }
 
 export default function DeleteModal(prop: ModalProps): JSX.Element {
@@ -15,7 +15,9 @@ export default function DeleteModal(prop: ModalProps): JSX.Element {
 
   const { showModalDelete, setShowModalDelete, data, setData } = prop;
 
-  const handleSubmit = (): void => {};
+  const handleDeleteProduct = (): void => {
+    dispatch(deleteProducts(data?.id as number));
+  };
 
   const handleCloseModal = (): void => {
     setShowModalDelete(false);
@@ -33,7 +35,7 @@ export default function DeleteModal(prop: ModalProps): JSX.Element {
           <div className='w-full'>
             <br />
             <div>
-              <Button className='w-full' onClick={() => handleSubmit()}>
+              <Button className='w-full' onClick={() => handleDeleteProduct()}>
                 Delete Product
               </Button>
             </div>

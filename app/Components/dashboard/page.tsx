@@ -37,7 +37,6 @@ export default function Dashboard(props: Props) {
 
   useEffect(() => {
     let newProduct = Array.isArray(product) ? [...product] : [];
-    console.log(newProduct);
     
     if (searchValue !== '') {
       newProduct = newProduct.filter((item: any) =>
